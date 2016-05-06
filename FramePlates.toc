@@ -1,0 +1,8 @@
+## Interface: 70000
+## Title: Frame Plates
+## Author: Lleaf
+## SavedVariables: FramePlatesDB
+
+## Notes: "Unitframes for your nameplates"
+
+FramePlates.lua
