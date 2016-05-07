@@ -9,14 +9,17 @@ local reverseY = false
 local frameWidth = 80
 local frameHeight = 20
 local framePadding = 1
+local backgroundColor = {r = 0, g = 0, b = 0, a = 1}
 local healthBarTexture = "Interface\\TargetingFrame\\UI-StatusBar"
---local healthBarColorTapped = {r = 0.7, g = 0.7, b = 0.7, a = 1}
---local healthBarColorHostile = {r = 0.7, g = 0, b = 0, a = 1}
---local healthBarColorFriendly = {r = 0, g = 0.7, b = 0, a = 1}
---local healthBarColorNeutral = {r = 0.7, g = 0.7, b = 0, a = 1}
+local healthBarColorTrivial = {r = 0.4, g = 0.4, b = 0.4, a = 1}
 local font = "Fonts\\FRIZQT__.TTF"
 local fontHeight = 8
+local fontFlag = "OUTLINE"
 local fontColor = {r = 1, g = 1, b = 1, a = 1}
+local highlightTexture = "Interface\\ChatFrame\\ChatFrameBackground"
+local highlightColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.5}
+local targetedTexture = "Interface\\ChatFrame\\ChatFrameBackground"
+local targetedColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.5}
 
 
 --------------
@@ -31,6 +34,7 @@ local UnitIsEnemy = UnitIsEnemy
 local UnitIsFriend = UnitIsFriend
 local UnitIsTapDenied = UnitIsTapDenied
 local UnitIsTrivial = UnitIsTrivial
+local UnitIsUnit = UnitIsUnit
 local UnitName = UnitName
 
 
@@ -58,10 +62,11 @@ local statusbarBackdrop = {
 	edgeSize = 0
 }
 
+
 ------------------
 -- Parent Frame --
 ------------------
-local FramePlatesParent = CreateFrame("Frame", "FramesPlates")
+local FramePlatesParent = CreateFrame("Frame", "FramePlates")
 FramePlatesParent.background = CreateFrame("Frame", nil, FramePlatesParent)
 FramePlatesParent.background:SetAllPoints()
 FramePlatesParent.background:SetBackdrop(backdrop)
@@ -77,10 +82,7 @@ FramePlatesParent:Show()
 -- Functions --
 ---------------
 do
-	local tappedR, tappedG, tappedB, tappedA = healthBarColorTapped.r, healthBarColorTapped.g, healthBarColorTapped.b, healthBarColorTapped.a
-	local hostileR, hostileG, hostileB, hostileA = healthBarColorHostile.r, healthBarColorHostile.g, healthBarColorHostile.b, healthBarColorHostile.a
-	local friendlyR, friendlyG, friendlyB, friendlyA = healthBarColorFriendly.r, healthBarColorFriendly.g, healthBarColorFriendly.b, healthBarColorFriendly.a
-	local neutralR, neutralG, neutralB, neutralA = healthBarColorNeutral.r, healthBarColorNeutral.g, healthBarColorNeutral.b, healthBarColorNeutral.a
+	local trivialR, trivialG, trivialB, trivialA = healthBarColorTrivial.r, healthBarColorTrivial.g, healthBarColorTrivial.b, healthBarColorTrivial.a
 	
 	local function getHealthBar(unitID)
 		return C_NamePlate_GetNamePlateForUnit(unitID).UnitFrame.healthBar
@@ -92,19 +94,19 @@ do
 			return
 		end
 		local statusbar = self.statusbar
-		--[[if UnitIsTapDenied(unitID) then
-			statusbar:SetStatusBarColor(tappedR, tappedG, tappedB, tappedA)
-		elseif UnitIsFriend("player", unitID) then
-			statusbar:SetStatusBarColor(friendlyR, friendlyG, friendlyB, friendlyA)
-		elseif UnitIsEnemy("player", unitID) and not UnitIsTrivial(unitID) then
-			statusbar:SetStatusBarColor(hostileR, hostileG, hostileB, hostileA)
-		else
-			statusbar:SetStatusBarColor(neutralR, neutralG, neutralB, neutralA)
-		end]]--
 		if not self.healthBar then
 			self.healthBar = getHealthBar(unitID)
 		end
-		statusbar:SetStatusBarColor(self.healthBar.r, self.healthBar.g, self.healthBar.b, self.healthBar.a)
+		if UnitIsTrivial(unitID) then
+			statusbar:SetStatusBarColor(trivialR, trivialG, trivialB, trivialA)
+		else
+			statusbar:SetStatusBarColor(self.healthBar.r, self.healthBar.g, self.healthBar.b, self.healthBar.a)
+		end
+		if UnitIsUnit(unitID, "target") then
+			self.targeted:Show()
+		else
+			self.targeted:Hide()
+		end
 	end	
 	
 	local function eventHandler(self, event, unitID)
@@ -141,7 +143,7 @@ do
 		frame.background = CreateFrame("Frame", nil, frame)
 		frame.background:SetAllPoints()
 		frame.background:SetBackdrop(statusbarBackdrop)
-		frame.background:SetBackdropColor(0, 0, 0, 1)
+		frame.background:SetBackdropColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a)
 		
 		-- Health Bar
 		frame.statusbar = CreateFrame("StatusBar", nil, frame)
@@ -153,11 +155,25 @@ do
 		frame:SetHealthBarColor()
 		
 		-- Text
-		frame.fontString = frame.statusbar:CreateFontString()
+		frame.fontString = frame:CreateFontString()
 		frame.fontString:SetAllPoints()
-		frame.fontString:SetFont(font, fontHeight)
+		frame.fontString:SetFont(font, fontHeight, fontFlag)
 		frame.fontString:SetTextColor(fontColor.r, fontColor.g, fontColor.b, fontColor.a)
 		frame.fontString:SetText(UnitName(unitID))
+		
+		-- Highlighted
+		frame.highlight = frame:CreateTexture(nil, "HIGHLIGHT")
+		frame.highlight:SetAllPoints()
+		frame.highlight:SetTexture(highlightTexture)
+		frame.highlight:SetVertexColor(highlightColor.r, highlightColor.g, highlightColor.b, highlightColor.a)
+		frame:SetHighlightTexture(frame.highlight, "BLEND")
+		
+		-- Targeted
+		frame.targeted = frame:CreateTexture(nil, "ARTWORK")
+		frame.targeted:SetAllPoints()
+		frame.targeted:SetTexture(targetedTexture)
+		frame.targeted:SetVertexColor(targetedColor.r, targetedColor.g, targetedColor.b, targetedColor.a)
+		frame.targeted:Hide()
 		
 		-- Events
 		frame:RegisterUnitEvent("UNIT_HEALTH_FREQUENT", unitID)
@@ -165,6 +181,10 @@ do
 		frame:RegisterUnitEvent("UNIT_NAME_UPDATE", unitID)
 		frame:RegisterUnitEvent("NAME_PLATE_UNIT_ADDED", unitID)
 		frame:SetScript("OnEvent", eventHandler)
+		
+		-- Frame levels
+		frame.background:SetFrameStrata("LOW")
+		frame.statusbar:SetFrameStrata("LOW")
 		
 		return frame
 	end
