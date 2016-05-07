@@ -9,8 +9,11 @@ local reverseY = false
 local frameWidth = 80
 local frameHeight = 20
 local framePadding = 1
-local healthbarTexture = "Interface\\TargetingFrame\\UI-StatusBar"
-local healthbarColor = {r = 0, g = 0.7, b = 0, a = 1}
+local healthBarTexture = "Interface\\TargetingFrame\\UI-StatusBar"
+local healthBarColorTapped = {r = 0.7, g = 0.7, b = 0.7, a = 1}
+local healthBarColorHostile = {r = 0.7, g = 0, b = 0, a = 1}
+local healthBarColorFriendly = {r = 0, g = 0.7, b = 0, a = 1}
+local healthBarColorNeutral = {r = 0.7, g = 0.7, b = 0, a = 1}
 local font = "Fonts\\FRIZQT__.TTF"
 local fontHeight = 8
 local fontColor = {r = 1, g = 1, b = 1, a = 1}
@@ -20,9 +23,14 @@ local fontColor = {r = 1, g = 1, b = 1, a = 1}
 -- Upvalues --
 --------------
 local CreateFrame = CreateFrame
+local UnitExists = UnitExists
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
+local UnitIsEnemy = UnitIsEnemy
+local UnitIsFriend = UnitIsFriend
+local UnitIsTapDenied = UnitIsTapDenied
 local UnitName = UnitName
+
 
 ---------------
 -- Constants --
@@ -67,6 +75,25 @@ FramePlatesParent:Show()
 -- Functions --
 ---------------
 do
+	local tappedR, tappedG, tappedB, tappedA = healthBarColorTapped.r, healthBarColorTapped.g, healthBarColorTapped.b, healthBarColorTapped.a
+	local hostileR, hostileG, hostileB, hostileA = healthBarColorHostile.r, healthBarColorHostile.g, healthBarColorHostile.b, healthBarColorHostile.a
+	local friendlyR, friendlyG, friendlyB, friendlyA = healthBarColorFriendly.r, healthBarColorFriendly.g, healthBarColorFriendly.b, healthBarColorFriendly.a
+	local neutralR, neutralG, neutralB, neutralA = healthBarColorNeutral.r, healthBarColorNeutral.g, healthBarColorNeutral.b, healthBarColorNeutral.a
+	
+	local function setHealthBarColor(self)
+		local unitID = self.unitID
+		local statusbar = self.statusbar
+		if UnitIsTapDenied(unitID) then
+			statusbar:SetStatusBarColor(tappedR, tappedG, tappedB, tappedA)
+		elseif UnitIsEnemy("player", unitID) then
+			statusbar:SetStatusBarColor(hostileR, hostileG, hostileB, hostileA)
+		elseif UnitIsFriend("player", unitID) then
+			statusbar:SetStatusBarColor(friendlyR, friendlyG, friendlyB, friendlyA)
+		else
+			statusbar:SetStatusBarColor(neutralR, neutralG, neutralB, neutralA)
+		end
+	end	
+	
 	local function eventHandler(self, event, unitID)
 		if event == "UNIT_HEALTH_FREQUENT" then
 			self.statusbar:SetValue(UnitHealth(unitID))
@@ -77,6 +104,7 @@ do
 		elseif event == "NAME_PLATE_UNIT_ADDED" then
 			self.statusbar:SetMinMaxValues(0, UnitHealthMax(unitID))
 			self.statusbar:SetValue(UnitHealth(unitID))
+			self:SetHealthBarColor()
 			self.fontString:SetText(UnitName(unitID))
 		end
 	end
@@ -101,13 +129,14 @@ do
 		frame.background:SetBackdrop(statusbarBackdrop)
 		frame.background:SetBackdropColor(0, 0, 0, 1)
 		
-		-- Healthbar
+		-- Health Bar
 		frame.statusbar = CreateFrame("StatusBar", nil, frame)
 		frame.statusbar.unitID = unitID
 		frame.statusbar:SetAllPoints()
-		frame.statusbar:SetStatusBarTexture(healthbarTexture)
-		frame.statusbar:SetStatusBarColor(healthbarColor.r, healthbarColor.g, healthbarColor.b, healthbarColor.a)
+		frame.statusbar:SetStatusBarTexture(healthBarTexture)
 		frame.statusbar:SetMinMaxValues(0, UnitHealthMax(unitID))
+		frame.SetHealthBarColor = setHealthBarColor
+		frame:SetHealthBarColor()
 		
 		-- Text
 		frame.fontString = frame.statusbar:CreateFontString()
@@ -143,6 +172,9 @@ do
 				FramePlatesParent:CreateFramePlate("nameplate"..i, posX, posY)
 				posX = posX + posXIncrement
 				i = i + 1
+				if i > frameCount then
+					break
+				end
 			end
 			posX = 0
 			posY = posY + posYIncrement
@@ -153,11 +185,33 @@ do
 				FramePlatesParent:CreateFramePlate("nameplate"..i, posX, posY)
 				posY = posY + posYIncrement
 				i = i + 1
+				if i > frameCount then
+					break
+				end
 			end
 			posY = 0
 			posX = posX + posXIncrement
 		end
 	end
+end
+
+
+------------
+-- Ticker --
+------------
+do
+	local tickerFrame = CreateFrame("Frame")
+	local totalElapsed = 0
+	local function tickerFunc(self, elapsed)
+		totalElapsed = totalElapsed + elapsed
+		if totalElapsed > 0.2 then
+			for i = 1, frameCount do
+				FramePlatesParent["nameplate"..i]:SetHealthBarColor()
+			end
+			totalElapsed = 0
+		end
+	end
+	tickerFrame:SetScript("OnUpdate", tickerFunc)
 end
 
 
