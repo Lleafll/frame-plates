@@ -6,8 +6,8 @@ local rows = 10
 local growthDirection = "VERTICAL"  -- VERTICAL, HORIZONTAL
 local reverseX = false
 local reverseY = false
-local frameWidth = 64
-local frameHeight = 16
+local frameWidth = 80
+local frameHeight = 20
 local framePadding = 1
 local healthbarTexture = "Interface\\TargetingFrame\\UI-StatusBar"
 local healthbarColor = {r = 0, g = 0.7, b = 0, a = 1}
@@ -72,6 +72,8 @@ do
 			self.statusbar:SetValue(UnitHealth(unitID))
 		elseif event == "UNIT_MAXHEALTH" then
 			self.statusbar:SetMinMaxValues(0, UnitHealthMax(unitID))
+		elseif event == "UNIT_NAME_UPDATE" then
+			self.fontString:SetText(UnitName(unitID))
 		elseif event == "NAME_PLATE_UNIT_ADDED" then
 			self.statusbar:SetMinMaxValues(0, UnitHealthMax(unitID))
 			self.statusbar:SetValue(UnitHealth(unitID))
@@ -117,6 +119,7 @@ do
 		-- Events
 		frame:RegisterUnitEvent("UNIT_HEALTH_FREQUENT", unitID)
 		frame:RegisterUnitEvent("UNIT_MAXHEALTH", unitID)
+		frame:RegisterUnitEvent("UNIT_NAME_UPDATE", unitID)
 		frame:RegisterUnitEvent("NAME_PLATE_UNIT_ADDED", unitID)
 		frame:SetScript("OnEvent", eventHandler)
 		
