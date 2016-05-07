@@ -10,10 +10,10 @@ local frameWidth = 80
 local frameHeight = 20
 local framePadding = 1
 local healthBarTexture = "Interface\\TargetingFrame\\UI-StatusBar"
-local healthBarColorTapped = {r = 0.7, g = 0.7, b = 0.7, a = 1}
-local healthBarColorHostile = {r = 0.7, g = 0, b = 0, a = 1}
-local healthBarColorFriendly = {r = 0, g = 0.7, b = 0, a = 1}
-local healthBarColorNeutral = {r = 0.7, g = 0.7, b = 0, a = 1}
+--local healthBarColorTapped = {r = 0.7, g = 0.7, b = 0.7, a = 1}
+--local healthBarColorHostile = {r = 0.7, g = 0, b = 0, a = 1}
+--local healthBarColorFriendly = {r = 0, g = 0.7, b = 0, a = 1}
+--local healthBarColorNeutral = {r = 0.7, g = 0.7, b = 0, a = 1}
 local font = "Fonts\\FRIZQT__.TTF"
 local fontHeight = 8
 local fontColor = {r = 1, g = 1, b = 1, a = 1}
@@ -22,6 +22,7 @@ local fontColor = {r = 1, g = 1, b = 1, a = 1}
 --------------
 -- Upvalues --
 --------------
+local C_NamePlate_GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit
 local CreateFrame = CreateFrame
 local UnitExists = UnitExists
 local UnitHealth = UnitHealth
@@ -29,6 +30,7 @@ local UnitHealthMax = UnitHealthMax
 local UnitIsEnemy = UnitIsEnemy
 local UnitIsFriend = UnitIsFriend
 local UnitIsTapDenied = UnitIsTapDenied
+local UnitIsTrivial = UnitIsTrivial
 local UnitName = UnitName
 
 
@@ -80,18 +82,29 @@ do
 	local friendlyR, friendlyG, friendlyB, friendlyA = healthBarColorFriendly.r, healthBarColorFriendly.g, healthBarColorFriendly.b, healthBarColorFriendly.a
 	local neutralR, neutralG, neutralB, neutralA = healthBarColorNeutral.r, healthBarColorNeutral.g, healthBarColorNeutral.b, healthBarColorNeutral.a
 	
+	local function getHealthBar(unitID)
+		return C_NamePlate_GetNamePlateForUnit(unitID).UnitFrame.healthBar
+	end
+	
 	local function setHealthBarColor(self)
 		local unitID = self.unitID
+		if not UnitExists(unitID) then
+			return
+		end
 		local statusbar = self.statusbar
-		if UnitIsTapDenied(unitID) then
+		--[[if UnitIsTapDenied(unitID) then
 			statusbar:SetStatusBarColor(tappedR, tappedG, tappedB, tappedA)
-		elseif UnitIsEnemy("player", unitID) then
-			statusbar:SetStatusBarColor(hostileR, hostileG, hostileB, hostileA)
 		elseif UnitIsFriend("player", unitID) then
 			statusbar:SetStatusBarColor(friendlyR, friendlyG, friendlyB, friendlyA)
+		elseif UnitIsEnemy("player", unitID) and not UnitIsTrivial(unitID) then
+			statusbar:SetStatusBarColor(hostileR, hostileG, hostileB, hostileA)
 		else
 			statusbar:SetStatusBarColor(neutralR, neutralG, neutralB, neutralA)
+		end]]--
+		if not self.healthBar then
+			self.healthBar = getHealthBar(unitID)
 		end
+		statusbar:SetStatusBarColor(self.healthBar.r, self.healthBar.g, self.healthBar.b, self.healthBar.a)
 	end	
 	
 	local function eventHandler(self, event, unitID)
@@ -104,6 +117,7 @@ do
 		elseif event == "NAME_PLATE_UNIT_ADDED" then
 			self.statusbar:SetMinMaxValues(0, UnitHealthMax(unitID))
 			self.statusbar:SetValue(UnitHealth(unitID))
+			self.healthBar = getHealthBar(unitID)
 			self:SetHealthBarColor()
 			self.fontString:SetText(UnitName(unitID))
 		end
