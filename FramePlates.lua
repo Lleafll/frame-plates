@@ -74,7 +74,6 @@ FramePlatesParent.background:SetBackdropColor(0.5, 0.5, 0.5, 0.5)
 FramePlatesParent.background:Hide()
 FramePlatesParent:SetWidth(frameWidth * columns + framePadding * (columns - 1))
 FramePlatesParent:SetHeight(frameHeight * rows + framePadding * (rows - 1))
-FramePlatesParent:EnableMouse(true)
 FramePlatesParent:SetMovable(true)
 FramePlatesParent:Show()
 
@@ -262,6 +261,7 @@ do
 
 	function FramePlatesParent:Unlock()
 		self.background:Show()
+		self:EnableMouse(true)
 		self:SetScript("OnMouseDown", function(self, button)
 			if button == "RightButton" then
 				dragStop(self)  -- in case user right clicks while dragging the frame
