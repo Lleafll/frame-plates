@@ -182,8 +182,9 @@ do
 		frame:SetScript("OnEvent", eventHandler)
 		
 		-- Frame levels
-		frame.background:SetFrameStrata("LOW")
-		frame.statusbar:SetFrameStrata("LOW")
+		frame:SetFrameStrata("LOW")
+		frame.background:SetFrameStrata("BACKGROUND")
+		frame.statusbar:SetFrameStrata("BACKGROUND")
 		
 		return frame
 	end
