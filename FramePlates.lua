@@ -1,6 +1,7 @@
 --------------
 -- Settings --
 --------------
+-- Visuals
 local frameCount = 10
 local rows = 10
 local growthDirection = "VERTICAL"  -- VERTICAL, HORIZONTAL
@@ -20,6 +21,16 @@ local highlightTexture = "Interface\\ChatFrame\\ChatFrameBackground"
 local highlightColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.5}
 local targetedTexture = "Interface\\ChatFrame\\ChatFrameBackground"
 local targetedColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.5}
+local auraDirection = "RIGHT"  -- RIGHT, DOWN, LEFT, RIGHT
+
+-- Auras
+local auras = {}  -- Sorted by inspect specialization ID
+auras[266] = {  -- Demonology
+	[1] = {
+		aura = GetSpellInfo(124913),  -- Doom
+		icon = select(3, GetSpellInfo(124913))
+	}
+}
 
 
 --------------
@@ -27,6 +38,9 @@ local targetedColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.5}
 --------------
 local C_NamePlate_GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit
 local CreateFrame = CreateFrame
+local GetTime = GetTime
+local pairs = pairs
+local UnitAura = UnitAura
 local UnitExists = UnitExists
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
@@ -49,6 +63,7 @@ local UnitName = UnitName
 local anchorPoint = (reverseY and "TOP" or "BOTTOM") .. (reverseX and "RIGHT" or "LEFT")
 local columns = math.ceil(frameCount/rows)
 local db
+local specializationID = GetInspectSpecialization()
 local backdrop = {
 	bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
 	edgeFile = nil,
@@ -60,6 +75,17 @@ local statusbarBackdrop = {
 	edgeFile = nil,
 	tile = false,
 	edgeSize = 0
+}
+
+
+------------
+-- Lookup --
+------------
+local oppositePoint = {
+	"RIGHT" = "LEFT",
+	"DOWN" = "UP",
+	"RIGHT" = "LEFT",
+	"UP" = "DOWN"
 }
 
 
@@ -76,6 +102,7 @@ FramePlatesParent:SetWidth(frameWidth * columns + framePadding * (columns - 1))
 FramePlatesParent:SetHeight(frameHeight * rows + framePadding * (rows - 1))
 FramePlatesParent:SetMovable(true)
 FramePlatesParent:Show()
+
 
 ---------------
 -- Functions --
@@ -121,6 +148,18 @@ do
 			self.healthBar = getHealthBar(unitID)
 			self:SetHealthBarColor()
 			self.fontString:SetText(UnitName(unitID))
+		end
+	end
+	
+	local function dotEventHandler(self, event, unitID)
+		local _, _, _, _, _, duration, expires = UnitAura(unitID, self.aura, "PLAYER")
+		if duration then
+			if duration != self.duration or expires != self.expires then
+				self:Show()
+				self.cooldown:SetCooldown(expires - duration, duration)
+			end
+		else
+			self:Hide()
 		end
 	end
 
@@ -185,6 +224,39 @@ do
 		frame:SetFrameStrata("LOW")
 		frame.background:SetFrameStrata("BACKGROUND")
 		frame.statusbar:SetFrameStrata("BACKGROUND")
+		
+		-- DoTs
+		do
+			local xOffset = 0
+			local yOffset = 0
+			for k, v in pairs(aura[specializationID]) do
+				-- DoT parent frame
+				local dotFrame = CreateFrame("Frame", nil, frame)
+				dotFrame.aura = v.aura
+				dotFrame:SetPoint(oppositePoint[auraDirection], auraDirection, xOffset, yOffset)
+				dotFrame:SetHeight(frameHeight)  -- TODO: implement proper logic
+				dotFrame:SetWidth(frameHeight)
+				frame[v.name] = dotFrame
+				
+				-- DoT frame texture
+				local texture = dotFrame:CreateTexture(nil, "BACKGROUND")
+				texture:SetAllPoints()
+				texture:SetTexture(v.icon)
+				dotFrame.texture = texture
+				
+				-- DoT cooldown
+				local cooldown = CreateFrame("Cooldown", nil, dotFrame)
+				cooldown:SetAllPoints()
+				dotFrame.cooldown = cooldown
+				
+				dotFrame:RegisterUnitEvent("UNIT_AURA", unitID)
+				dotFrame:RegisterUnitEvent("NAME_PLATE_UNIT_ADDED", unitID)
+				dotFrame:SetScript("OnEvent", eventHandler)
+				
+				xOffset = xOffset + frameHeight  -- TODO: implement proper logic
+				-- yOffset
+			end
+		end
 		
 		return frame
 	end
