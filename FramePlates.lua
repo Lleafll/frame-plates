@@ -229,7 +229,7 @@ do
 		frame.highlight:SetAllPoints()
 		frame.highlight:SetTexture(highlightTexture)
 		frame.highlight:SetVertexColor(highlightColor.r, highlightColor.g, highlightColor.b, highlightColor.a)
-		frame:SetHighlightTexture(frame.highlight, "BLEND")
+		frame:SetHighlightTexture(frame.highlight, "ADD")
 		
 		-- Targeted
 		frame.targeted = frame:CreateTexture(nil, "ARTWORK")
