@@ -16,6 +16,7 @@ local healthBarColorTrivial = {r = 0.4, g = 0.4, b = 0.4, a = 1}
 local font = "Fonts\\FRIZQT__.TTF"
 local fontHeight = 8
 local fontFlag = "NONE"  -- "MONOCHROMEOUTLINE" etc.
+local fontShadow = true
 local fontColor = {r = 1, g = 1, b = 1, a = 1}
 local highlightTexture = "Interface\\ChatFrame\\ChatFrameBackground"
 local highlightColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.5}
@@ -204,6 +205,9 @@ do
 		frame.fontString:SetFont(font, fontHeight, fontFlag)
 		frame.fontString:SetTextColor(fontColor.r, fontColor.g, fontColor.b, fontColor.a)
 		frame.fontString:SetText(UnitName(unitID))
+		if fontShadow then
+			frame.fontString:SetShadowOffset(1, -1)
+		end
 		
 		-- Highlighted
 		frame.highlight = frame:CreateTexture(nil, "HIGHLIGHT")
