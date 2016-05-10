@@ -13,6 +13,8 @@ local framePadding = 1
 local backgroundColor = {r = 0, g = 0, b = 0, a = 1}
 local healthBarTexture = "Interface\\ChatFrame\\ChatFrameBackground"  --"Interface\\TargetingFrame\\UI-StatusBar"
 local healthBarColorTrivial = {r = 0.4, g = 0.4, b = 0.4, a = 1}
+local healthBarBorder = true
+local healthBarBorderColor = {r = 0, g = 0, b = 0, a = 1}
 local font = "Fonts\\FRIZQT__.TTF"
 local fontHeight = 8
 local fontFlag = "NONE"  -- "MONOCHROMEOUTLINE" etc.
@@ -87,6 +89,12 @@ local statusbarBackdrop = {
 	edgeFile = nil,
 	tile = false,
 	edgeSize = 0
+}
+local borderBackdrop = {
+	bgFile = nil,
+	edgeFile = "Interface\\ChatFrame\\ChatFrameBackground",
+	tile = false,
+	edgeSize = 1
 }
 
 
@@ -198,6 +206,13 @@ do
 		frame.statusbar:SetMinMaxValues(0, UnitHealthMax(unitID))
 		frame.SetHealthBarColor = setHealthBarColor
 		frame:SetHealthBarColor()
+		
+		-- Border
+		local border = CreateFrame("Frame", nil, frame.statusbar)
+		border:SetAllPoints()
+		border:SetBackdrop(borderBackdrop)
+		border:SetBackdropBorderColor(healthBarBorderColor.r, healthBarBorderColor.b, healthBarBorderColor.g, healthBarBorderColor.a)
+		frame.statusbar.border = border
 		
 		-- Text
 		frame.fontString = frame:CreateFontString()
