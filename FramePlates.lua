@@ -161,6 +161,8 @@ do
 			if duration ~= self.duration or expires ~= self.expires then
 				self:Show()
 				self.cooldown:SetCooldown(expires - duration, duration)
+				self.duration = duration
+				self.expires = expires
 			end
 		else
 			self:Hide()
