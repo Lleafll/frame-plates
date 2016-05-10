@@ -35,7 +35,7 @@ local colorFunctionString = [[
 local auraDirection = "RIGHT"  -- RIGHT, DOWN, LEFT, RIGHT
 
 -- Auras
-local auras = {}  -- Sorted by inspect specialization ID
+local auras = {}
 auras.Warlock = {
 	[2] = {  -- Demonology
 		[1] = {
