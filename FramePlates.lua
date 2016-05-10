@@ -21,6 +21,14 @@ local highlightTexture = "Interface\\ChatFrame\\ChatFrameBackground"
 local highlightColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.5}
 local targetedTexture = "Interface\\ChatFrame\\ChatFrameBackground"
 local targetedColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.5}
+local colorFunctionString = [[
+	self, unitID, r, g, b, a = ...
+	if UnitIsTrivial(unitID) then
+		return 0.4, 0.4, 0.4, 1
+	else
+		return r, g, b, a
+	end
+]]
 local auraDirection = "RIGHT"  -- RIGHT, DOWN, LEFT, RIGHT
 
 -- Auras
@@ -61,6 +69,7 @@ local UnitName = UnitName
 -- Variables --
 ---------------
 local anchorPoint = (reverseY and "TOP" or "BOTTOM") .. (reverseX and "RIGHT" or "LEFT")
+local colorFunction = assert(loadstring(colorFunctionString))
 local columns = math.ceil(frameCount/rows)
 local db
 local specializationID = GetInspectSpecialization()
@@ -119,20 +128,15 @@ do
 		if not UnitExists(unitID) then
 			return
 		end
-		local statusbar = self.statusbar
 		if not self.healthBar then
 			self.healthBar = getHealthBar(unitID)
-		end
-		if UnitIsTrivial(unitID) then
-			statusbar:SetStatusBarColor(trivialR, trivialG, trivialB, trivialA)
-		else
-			statusbar:SetStatusBarColor(self.healthBar.r, self.healthBar.g, self.healthBar.b, self.healthBar.a)
 		end
 		if UnitIsUnit(unitID, "target") then
 			self.targeted:Show()
 		else
 			self.targeted:Hide()
 		end
+		self.statusbar:SetStatusBarColor(colorFunction(self, unitID, self.healthBar.r, self.healthBar.g, self.healthBar.b, self.healthBar.a))
 	end	
 	
 	local function eventHandler(self, event, unitID)
