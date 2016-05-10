@@ -253,7 +253,7 @@ do
 							dotFrame.texture = texture
 							
 							-- DoT cooldown
-							local cooldown = CreateFrame("Cooldown", nil, dotFrame)
+							local cooldown = CreateFrame("Cooldown", nil, dotFrame, "CooldownFrameTemplate")
 							cooldown:SetAllPoints()
 							dotFrame.cooldown = cooldown
 							
