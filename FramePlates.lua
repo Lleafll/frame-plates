@@ -11,11 +11,11 @@ local frameWidth = 80
 local frameHeight = 20
 local framePadding = 1
 local backgroundColor = {r = 0, g = 0, b = 0, a = 1}
-local healthBarTexture = "Interface\\TargetingFrame\\UI-StatusBar"
+local healthBarTexture = "Interface\\ChatFrame\\ChatFrameBackground"  --"Interface\\TargetingFrame\\UI-StatusBar"
 local healthBarColorTrivial = {r = 0.4, g = 0.4, b = 0.4, a = 1}
 local font = "Fonts\\FRIZQT__.TTF"
 local fontHeight = 8
-local fontFlag = "OUTLINE"
+local fontFlag = "NONE"  -- "MONOCHROMEOUTLINE" etc.
 local fontColor = {r = 1, g = 1, b = 1, a = 1}
 local highlightTexture = "Interface\\ChatFrame\\ChatFrameBackground"
 local highlightColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.5}
