@@ -33,10 +33,12 @@ local auraDirection = "RIGHT"  -- RIGHT, DOWN, LEFT, RIGHT
 
 -- Auras
 local auras = {}  -- Sorted by inspect specialization ID
-auras[266] = {  -- Demonology
-	[1] = {
-		aura = GetSpellInfo(124913),  -- Doom
-		icon = select(3, GetSpellInfo(124913))
+auras.Warlock = {
+	[2] = {  -- Demonology
+		[1] = {
+			aura = GetSpellInfo(603),  -- Doom
+			icon = select(3, GetSpellInfo(603))
+		}
 	}
 }
 
@@ -49,6 +51,7 @@ local CreateFrame = CreateFrame
 local GetTime = GetTime
 local pairs = pairs
 local UnitAura = UnitAura
+local UnitDebuff = UnitDebuff
 local UnitExists = UnitExists
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
@@ -72,7 +75,6 @@ local anchorPoint = (reverseY and "TOP" or "BOTTOM") .. (reverseX and "RIGHT" or
 local colorFunction = assert(loadstring(colorFunctionString))
 local columns = math.ceil(frameCount/rows)
 local db
-local specializationID = GetInspectSpecialization()
 local backdrop = {
 	bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
 	edgeFile = nil,
@@ -91,10 +93,10 @@ local statusbarBackdrop = {
 -- Lookup --
 ------------
 local oppositePoint = {
-	"RIGHT" = "LEFT",
-	"DOWN" = "UP",
-	"RIGHT" = "LEFT",
-	"UP" = "DOWN"
+	RIGHT = "LEFT",
+	DOWN = "UP",
+	RIGHT = "LEFT",
+	UP = "DOWN"
 }
 
 
@@ -117,8 +119,6 @@ FramePlatesParent:Show()
 -- Functions --
 ---------------
 do
-	local trivialR, trivialG, trivialB, trivialA = healthBarColorTrivial.r, healthBarColorTrivial.g, healthBarColorTrivial.b, healthBarColorTrivial.a
-	
 	local function getHealthBar(unitID)
 		return C_NamePlate_GetNamePlateForUnit(unitID).UnitFrame.healthBar
 	end
@@ -156,9 +156,9 @@ do
 	end
 	
 	local function dotEventHandler(self, event, unitID)
-		local _, _, _, _, _, duration, expires = UnitAura(unitID, self.aura, "PLAYER")
+		local _, _, _, _, _, duration, expires = UnitDebuff(unitID, self.aura, nil, "PLAYER")
 		if duration then
-			if duration != self.duration or expires != self.expires then
+			if duration ~= self.duration or expires ~= self.expires then
 				self:Show()
 				self.cooldown:SetCooldown(expires - duration, duration)
 			end
@@ -231,34 +231,41 @@ do
 		
 		-- DoTs
 		do
-			local xOffset = 0
-			local yOffset = 0
-			for k, v in pairs(aura[specializationID]) do
-				-- DoT parent frame
-				local dotFrame = CreateFrame("Frame", nil, frame)
-				dotFrame.aura = v.aura
-				dotFrame:SetPoint(oppositePoint[auraDirection], auraDirection, xOffset, yOffset)
-				dotFrame:SetHeight(frameHeight)  -- TODO: implement proper logic
-				dotFrame:SetWidth(frameHeight)
-				frame[v.name] = dotFrame
-				
-				-- DoT frame texture
-				local texture = dotFrame:CreateTexture(nil, "BACKGROUND")
-				texture:SetAllPoints()
-				texture:SetTexture(v.icon)
-				dotFrame.texture = texture
-				
-				-- DoT cooldown
-				local cooldown = CreateFrame("Cooldown", nil, dotFrame)
-				cooldown:SetAllPoints()
-				dotFrame.cooldown = cooldown
-				
-				dotFrame:RegisterUnitEvent("UNIT_AURA", unitID)
-				dotFrame:RegisterUnitEvent("NAME_PLATE_UNIT_ADDED", unitID)
-				dotFrame:SetScript("OnEvent", eventHandler)
-				
-				xOffset = xOffset + frameHeight  -- TODO: implement proper logic
-				-- yOffset
+			local classAuras = auras[UnitClass("player")]
+			if classAuras then
+				for specNumber, specAuras in pairs(classAuras) do
+					if specAuras then
+						local xOffset = 0
+						local yOffset = 0
+						for k, v in pairs(specAuras) do
+							-- DoT parent frame
+							local dotFrame = CreateFrame("Frame", nil, frame)
+							dotFrame.aura = v.aura
+							dotFrame:SetPoint(oppositePoint[auraDirection], frame, auraDirection, xOffset, yOffset)
+							dotFrame:SetHeight(frameHeight)  -- TODO: implement proper logic
+							dotFrame:SetWidth(frameHeight)
+							frame[v.aura] = dotFrame
+							
+							-- DoT frame texture
+							local texture = dotFrame:CreateTexture(nil, "BACKGROUND")
+							texture:SetAllPoints()
+							texture:SetTexture(v.icon)
+							dotFrame.texture = texture
+							
+							-- DoT cooldown
+							local cooldown = CreateFrame("Cooldown", nil, dotFrame)
+							cooldown:SetAllPoints()
+							dotFrame.cooldown = cooldown
+							
+							dotFrame:RegisterUnitEvent("UNIT_AURA", unitID)
+							dotFrame:RegisterUnitEvent("NAME_PLATE_UNIT_ADDED", unitID)
+							dotFrame:SetScript("OnEvent", dotEventHandler)
+							
+							xOffset = xOffset + frameHeight  -- TODO: implement proper logic
+							-- yOffset
+						end
+					end
+				end
 			end
 		end
 		
