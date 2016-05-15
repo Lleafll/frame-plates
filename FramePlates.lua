@@ -44,6 +44,18 @@ auras.Warlock = {
 		}
 	}
 }
+auras.Druid = {
+	[1] = {
+		[1] = {
+			aura = GetSpellInfo(8921),  -- Moonfire
+			icon = select(3, GetSpellInfo(8921))
+		},
+		[2] = {
+			aura = GetSpellInfo(93402),  -- Sunfire
+			icon = select(3, GetSpellInfo(93402))
+		}
+	}
+}
 
 
 --------------
