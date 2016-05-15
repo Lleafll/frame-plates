@@ -37,6 +37,16 @@ local auraDirection = "RIGHT"  -- RIGHT, DOWN, LEFT, RIGHT
 -- Auras
 local auras = {}
 auras.Warlock = {
+	[1] = {  -- Affliction
+		[1] = {
+			aura = GetSpellInfo(980),  -- Agony
+			icon = select(3, GetSpellInfo(980))
+		},
+		[2] = {
+			aura = GetSpellInfo(172),  -- Corruption
+			icon = select(3, GetSpellInfo(172))
+		}
+	},
 	[2] = {  -- Demonology
 		[1] = {
 			aura = GetSpellInfo(603),  -- Doom
