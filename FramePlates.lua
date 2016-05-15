@@ -177,6 +177,11 @@ do
 	end
 	
 	local function dotEventHandler(self, event, unitID)
+		if event == "NAME_PLATE_UNIT_ADDED" then
+			self.duration = nil
+			self.expires = nil
+		end
+		
 		local _, _, _, _, _, duration, expires = UnitDebuff(unitID, self.aura, nil, "PLAYER")
 		if duration then
 			if duration ~= self.duration or expires ~= self.expires then
