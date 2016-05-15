@@ -2,8 +2,8 @@
 -- Settings --
 --------------
 -- Visuals
-local frameCount = 10
-local rows = 10
+local frameCount = 15
+local rows = 15
 local growthDirection = "VERTICAL"  -- VERTICAL, HORIZONTAL
 local reverseX = false
 local reverseY = false
