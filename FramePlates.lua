@@ -45,6 +45,10 @@ auras.Warlock = {
 		[2] = {
 			aura = GetSpellInfo(172),  -- Corruption
 			icon = select(3, GetSpellInfo(172))
+		},
+		[3] = {
+			aura = GetSpellInfo(27243),  -- Seed of Corruption
+			icon = select(3, GetSpellInfo(27243))
 		}
 	},
 	[2] = {  -- Demonology
