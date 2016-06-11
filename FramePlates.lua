@@ -37,44 +37,7 @@ local colorFunctionString = [[
 		return r, g, b, a
 	end
 ]]
-local auraDirection = "RIGHT"  -- RIGHT, DOWN, LEFT, RIGHT
 
--- Auras
-local auras = {}
-auras.Warlock = {
-	[1] = {  -- Affliction
-		[1] = {
-			aura = GetSpellInfo(980),  -- Agony
-			icon = select(3, GetSpellInfo(980))
-		},
-		[2] = {
-			aura = GetSpellInfo(172),  -- Corruption
-			icon = select(3, GetSpellInfo(172))
-		},
-		[3] = {
-			aura = GetSpellInfo(27243),  -- Seed of Corruption
-			icon = select(3, GetSpellInfo(27243))
-		}
-	},
-	[2] = {  -- Demonology
-		[1] = {
-			aura = GetSpellInfo(603),  -- Doom
-			icon = select(3, GetSpellInfo(603))
-		}
-	}
-}
-auras.Druid = {
-	[1] = {
-		[1] = {
-			aura = GetSpellInfo(8921),  -- Moonfire
-			icon = select(3, GetSpellInfo(8921))
-		},
-		[2] = {
-			aura = GetSpellInfo(93402),  -- Sunfire
-			icon = select(3, GetSpellInfo(93402))
-		}
-	}
-}
 
 
 --------------
@@ -246,25 +209,6 @@ do
 			self.NameFontString:SetText(UnitName(unitID))
 		end
 	end
-		
-	local function dotEventHandler(self, event, unitID)
-		if event == "NAME_PLATE_UNIT_ADDED" then
-			self.duration = nil
-			self.expires = nil
-		end
-		
-		local _, _, _, _, _, duration, expires = UnitDebuff(unitID, self.aura, nil, "PLAYER")
-		if duration then
-			if duration ~= self.duration or expires ~= self.expires then
-				self:Show()
-				self.cooldown:SetCooldown(expires - duration, duration)
-				self.duration = duration
-				self.expires = expires
-			end
-		else
-			self:Hide()
-		end
-	end
 
 	function FramePlatesParent:CreateFramePlate(unitID, posX, posY)
 		-- Secure frame
@@ -351,46 +295,6 @@ do
 		frame:SetFrameStrata("LOW")
 		frame.background:SetFrameStrata("BACKGROUND")
 		frame.statusbar:SetFrameStrata("BACKGROUND")
-		
-		-- DoTs
-		do
-			local classAuras = auras[UnitClass("player")]
-			if classAuras then
-				for specNumber, specAuras in pairs(classAuras) do
-					if specAuras then
-						local xOffset = 0
-						local yOffset = 0
-						for k, v in pairs(specAuras) do
-							-- DoT parent frame
-							local dotFrame = CreateFrame("Frame", nil, frame)
-							dotFrame.aura = v.aura
-							dotFrame:SetPoint(oppositePoint[auraDirection], frame, auraDirection, xOffset, yOffset)
-							dotFrame:SetHeight(frameHeight)  -- TODO: implement proper logic
-							dotFrame:SetWidth(frameHeight)
-							frame[v.aura] = dotFrame
-							
-							-- DoT frame texture
-							local texture = dotFrame:CreateTexture(nil, "BACKGROUND")
-							texture:SetAllPoints()
-							texture:SetTexture(v.icon)
-							dotFrame.texture = texture
-							
-							-- DoT cooldown
-							local cooldown = CreateFrame("Cooldown", nil, dotFrame, "CooldownFrameTemplate")
-							cooldown:SetAllPoints()
-							dotFrame.cooldown = cooldown
-							
-							dotFrame:RegisterUnitEvent("UNIT_AURA", unitID)
-							dotFrame:RegisterUnitEvent("NAME_PLATE_UNIT_ADDED", unitID)
-							dotFrame:SetScript("OnEvent", dotEventHandler)
-							
-							xOffset = xOffset + frameHeight  -- TODO: implement proper logic
-							-- yOffset
-						end
-					end
-				end
-			end
-		end
 		
 		return frame
 	end
