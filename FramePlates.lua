@@ -68,7 +68,6 @@ local UnitName = UnitName
 -- Constants --
 ---------------
 local UI_SCALE = UIParent:GetScale()
-print(UI_SCALE)
 
 
 ---------------
