@@ -7,8 +7,8 @@ local rows = 15
 local growthDirection = "VERTICAL"  -- VERTICAL, HORIZONTAL
 local reverseX = false
 local reverseY = false
-local frameWidth = 80
-local frameHeight = 20
+local frameWidth = 100
+local frameHeight = 25
 local framePadding = 1
 local backgroundColor = {r = 0, g = 0, b = 0, a = 1}
 local healthBarTexture = "Interface\\ChatFrame\\ChatFrameBackground"  --"Interface\\TargetingFrame\\UI-StatusBar"
@@ -48,6 +48,8 @@ local CreateFrame = CreateFrame
 local GetTime = GetTime
 local IsItemInRange = IsItemInRange
 local ItemHasRange = ItemHasRange
+local math_ceil = math.ceil
+local math_floor = math.floor
 local pairs = pairs
 local UnitAura = UnitAura
 local UnitDebuff = UnitDebuff
@@ -65,6 +67,8 @@ local UnitName = UnitName
 ---------------
 -- Constants --
 ---------------
+local UI_SCALE = UIParent:GetScale()
+print(UI_SCALE)
 
 
 ---------------
@@ -72,7 +76,7 @@ local UnitName = UnitName
 ---------------
 local anchorPoint = (reverseY and "TOP" or "BOTTOM") .. (reverseX and "RIGHT" or "LEFT")
 local colorFunction = assert(loadstring(colorFunctionString))
-local columns = math.ceil(frameCount/rows)
+local columns = math_ceil(frameCount/rows)
 local db
 local backdrop = {
 	bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -90,7 +94,8 @@ local borderBackdrop = {
 	bgFile = nil,
 	edgeFile = "Interface\\ChatFrame\\ChatFrameBackground",
 	tile = false,
-	edgeSize = 1
+	edgeSize = 1,
+  padding = 1
 }
 
 
@@ -211,6 +216,11 @@ do
 	end
 
 	function FramePlatesParent:CreateFramePlate(unitID, posX, posY)
+    posX = math_floor(posX)
+    posY = math_floor(posY)
+    posX = posX + (frameWidth % 2 > 0 and 0.5 or 0)
+    posY = posY + (frameHeight % 2 > 0 and 0.5 or 0)
+    
 		-- Secure frame
 		local frame = CreateFrame("BUTTON", nil, self, "SecureUnitButtonTemplate")
 		self[unitID] = frame
@@ -219,9 +229,9 @@ do
 		frame:SetAttribute("target", unitID)
 		frame:SetAttribute("unit", unitID)
 		RegisterUnitWatch(frame)
-		frame:SetWidth(frameWidth)
-		frame:SetHeight(frameHeight)
-		frame:SetPoint(anchorPoint, posX, posY)
+		frame:SetWidth(UI_SCALE * frameWidth)
+		frame:SetHeight(UI_SCALE * frameHeight)
+		frame:SetPoint(db.anchor, UI_SCALE * posX, UI_SCALE * posY)
 		frame:Show()
 		
 		-- Background
@@ -304,7 +314,7 @@ end
 --------------------
 -- Frame Creation --
 --------------------
-do
+function FramePlatesParent:CreateFrames()
 	local i = 1
 	local posX = 0
 	local posXIncrement = (frameWidth + framePadding) * (reverseX and - 1 or 1)
@@ -367,9 +377,10 @@ end
 do
 	local function dragStop(self)
 		self:StopMovingOrSizing()
-		local _, _, _, posX, posY = self:GetPoint()
-		db.posX = posX
-		db.posY = posY
+		local _, _, anchor, posX, posY = self:GetPoint()
+    db.anchor = anchor
+		db.posX = math_ceil(posX / UI_SCALE - 0.5)
+		db.posY = math_ceil(posY / UI_SCALE - 0.5)
 	end
 
 	function FramePlatesParent:Unlock()
@@ -392,7 +403,7 @@ do
 			else
 				db.posY = db.posY + delta
 			end
-			self:SetPoint("CENTER", db.posX, db.posY)
+			self:SetPoint(db.anchor, UI_SCALE * db.posX, UI_SCALE * db.posY)
 		end)
 		self.unlocked = true
 		print("Frame Plates unlocked")
@@ -420,8 +431,10 @@ do
 			db = FramePlatesDB
 			db.posX = db.posX or 0
 			db.posY = db.posY or 0
-			FramePlatesParent:SetPoint("CENTER", db.posX, db.posY)
-			FramePlatesParent:UnregisterEvent("ADDON_LOADED")
+      db.anchor = db.anchor or "CENTER"
+			self:SetPoint(db.anchor, UI_SCALE * db.posX, UI_SCALE * db.posY)
+			self:UnregisterEvent("ADDON_LOADED")
+      self:CreateFrames()
 		end
 	end
 	FramePlatesParent:RegisterEvent("ADDON_LOADED")
