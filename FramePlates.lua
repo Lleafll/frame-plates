@@ -148,7 +148,7 @@ if growthDirection == "VERTICAL" then
 else
   FramePlatesParent:SetWidth(UI_SCALE * (frameWidth * frameCount + framePadding * (frameCount - 1)))
   FramePlatesParent:SetHeight(UI_SCALE * frameHeight)
-end
+end -- if
 FramePlatesParent:SetMovable(true)
 FramePlatesParent:SetUserPlaced(false)
 FramePlatesParent:Show()
@@ -168,42 +168,42 @@ do
           maxDistance = i
           if maxDistance <= 3 then
             minDistance = 0
-          end
+          end -- if
         else
           minDistance = i
-        end
-      end
+        end -- if
+      end -- if
       if maxDistance and minDistance then break end
-    end
+    end -- for
     local distance
     if not maxDistance or not minDistance then  -- Distance > 100 yd, first range check, or something went wrong
       distance = ""
     else
       distance = maxDistance
-    end
+    end -- if
     self.distanceFontString:SetText(distance)
-  end
+  end -- function
   
   local function getHealthBar(unitID)
     local nameplateUnitFrame = C_NamePlate_GetNamePlateForUnit(unitID).UnitFrame
     return nameplateUnitFrame.healthBar or nameplateUnitFrame.HealthBar
-  end
+  end -- function
   
   local function setHealthBarColor(self)
     local unitID = self.unitID
     if not UnitExists(unitID) then
       return
-    end
+    end -- if
     if not self.healthBar then
       self.healthBar = getHealthBar(unitID)
-    end
+    end -- if
     if UnitIsUnit(unitID, "target") then
       self.targeted:Show()
     else
       self.targeted:Hide()
-    end
+    end -- if
     self.statusbar:SetStatusBarColor(colorFunction(self, unitID, self.healthBar.r, self.healthBar.g, self.healthBar.b, self.healthBar.a))
-  end  
+  end -- function
   
   local function eventHandler(self, event, unitID)
     if event == "UNIT_HEALTH_FREQUENT" then
@@ -218,8 +218,8 @@ do
       self.healthBar = getHealthBar(unitID)
       self:SetHealthBarColor()
       self.NameFontString:SetText(UnitName(unitID))
-    end
-  end
+    end -- if
+  end -- function
 
   function FramePlatesParent:CreateFramePlate(unitID, posX, posY)
     -- Secure frame
@@ -266,7 +266,7 @@ do
     frame.NameFontString:SetText(UnitName(unitID))
     if fontShadow then
       frame.NameFontString:SetShadowOffset(1, -1)
-    end
+    end -- if
     
     -- Distance
     local distanceFontString = frame:CreateFontString()
@@ -278,7 +278,7 @@ do
     distanceFontString:SetTextColor(distanceFontColor.r, distanceFontColor.g, distanceFontColor.b, distanceFontColor.a)
     if distanceFontShadow then
       frame.NameFontString:SetShadowOffset(1, -1)
-    end
+    end -- if
     frame.SetDistance = setDistance
     frame:SetDistance()
     
@@ -309,8 +309,8 @@ do
     frame.statusbar:SetFrameStrata("BACKGROUND")
     
     return frame
-  end
-end
+  end -- function
+end -- do
 
 
 --------------------
@@ -325,15 +325,15 @@ function FramePlatesParent:CreateFrames()
     for i = 1, frameCount do
       FramePlatesParent:CreateFramePlate("nameplate"..i, posX, posY)
       posY = posY + posYIncrement
-    end
+    end -- for
   else
     local posXIncrement = (frameWidth + framePadding) * (reverseX and - 1 or 1) + 2  -- +2 for border
     for i = 1, frameCount do
       FramePlatesParent:CreateFramePlate("nameplate"..i, posX, posY)
       posX = posX + posXIncrement
-    end
-  end
-end
+    end -- for
+  end -- if
+end -- function
 
 
 ------------
@@ -349,12 +349,12 @@ do
         local plateFrame = FramePlatesParent["nameplate"..i]
         plateFrame:SetHealthBarColor()
         plateFrame:SetDistance()
-      end
+      end -- for
       totalElapsed = 0
-    end
-  end
+    end -- if
+  end -- function
   tickerFrame:SetScript("OnUpdate", tickerFunc)
-end
+end -- do
 
 
 --------------
@@ -370,7 +370,7 @@ do
     db.posY = math_floor(posY / UI_SCALE + 0.5)
     
     self:SetPoint("BOTTOMLEFT", UI_SCALE * db.posX, UI_SCALE * db.posY)
-  end
+  end -- function
 
   function FramePlatesParent:Unlock()
     self.background:Show()
@@ -381,22 +381,22 @@ do
         self:Lock()
       elseif button == "LeftButton" then
         self:StartMoving()
-      end
-    end)
+      end -- if
+    end) -- function
     self:SetScript("OnMouseUp", function(self, button)
       dragStop(self)
-    end)
+    end) -- function
     self:SetScript("OnMouseWheel", function(self, delta)
       if IsShiftKeyDown() then
         db.posX = db.posX + delta
       else
         db.posY = db.posY + delta
-      end
+      end -- if
       self:SetPoint("BOTTOMLEFT", UI_SCALE * db.posX, UI_SCALE * db.posY)
-    end)
+    end) -- function
     self.unlocked = true
     print("Frame Plates unlocked")
-  end
+  end -- function
 
   function FramePlatesParent:Lock()
     self.background:Hide()
@@ -406,8 +406,8 @@ do
     self:SetScript("OnMouseWheel", nil)
     self.unlocked = false
     print("Frame Plates locked")
-  end
-end
+  end -- function
+end -- do
 
 
 --------------------
@@ -423,11 +423,11 @@ do
       self:SetPoint("BOTTOMLEFT", UI_SCALE * db.posX, UI_SCALE * db.posY)
       self:UnregisterEvent("ADDON_LOADED")
       self:CreateFrames()
-    end
-  end
+    end -- if
+  end -- function
   FramePlatesParent:RegisterEvent("ADDON_LOADED")
   FramePlatesParent:SetScript("OnEvent", eventHandler)
-end
+end -- do
 
 
 -------------------
@@ -441,6 +441,6 @@ do
       FramePlatesParent:Lock()
     else
       FramePlatesParent:Unlock()
-    end
-  end
-end
+    end -- if
+  end -- function
+end -- do
