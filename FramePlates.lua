@@ -253,7 +253,8 @@ do
     
     -- Border
     local border = CreateFrame("Frame", nil, frame.statusbar)
-    border:SetAllPoints()
+    border:SetPoint("TOPLEFT", -1, 1)
+    border:SetPoint("BOTTOMRIGHT", 1, -1)
     border:SetBackdrop(borderBackdrop)
     border:SetBackdropBorderColor(healthBarBorderColor.r, healthBarBorderColor.b, healthBarBorderColor.g, healthBarBorderColor.a)
     frame.statusbar.border = border
@@ -321,13 +322,13 @@ function FramePlatesParent:CreateFrames()
   local posX = 0
   local posY = 0
   if growthDirection == "VERTICAL" then
-    local posYIncrement = (frameHeight + framePadding) * (reverseY and - 1 or 1)
+    local posYIncrement = (frameHeight + framePadding) * (reverseY and - 1 or 1) + 2  -- +2 for border
     for i = 1, frameCount do
       FramePlatesParent:CreateFramePlate("nameplate"..i, posX, posY)
       posY = posY + posYIncrement
     end
   else
-    local posXIncrement = (frameWidth + framePadding) * (reverseX and - 1 or 1)
+    local posXIncrement = (frameWidth + framePadding) * (reverseX and - 1 or 1) + 2  -- +2 for border
     for i = 1, frameCount do
       FramePlatesParent:CreateFramePlate("nameplate"..i, posX, posY)
       posX = posX + posXIncrement
