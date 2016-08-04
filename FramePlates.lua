@@ -177,7 +177,7 @@ do
     end
     local distance
     if not maxDistance or not minDistance then  -- Distance > 100 yd, first range check, or something went wrong
-      distance = -1
+      distance = ""
     else
       distance = maxDistance
     end
