@@ -11,19 +11,19 @@ local LSM = LibStub("LibSharedMedia-3.0")
 -- Visuals
 local frameCount = 15
 local growthDirection = "VERTICAL"  -- VERTICAL, HORIZONTAL
-local frameWidth = 100
-local frameHeight = 25
+local frameWidth = 163
+local frameHeight = 30
 local framePadding = 1
-local backgroundColor = {r = 0, g = 0, b = 0, a = 1}
-local healthBarTexture = "Interface\\ChatFrame\\ChatFrameBackground"  --"Interface\\TargetingFrame\\UI-StatusBar"
+local backgroundColor = {r = 17/256, g = 17/256, b = 17/256, a = 1}
+local healthBarTexture = LSM:Fetch("statusbar", "Smooth v2")
 local healthBarBorder = true
 local healthBarBorderColor = {r = 0, g = 0, b = 0, a = 1}
-local font = "Fonts\\FRIZQT__.TTF"
+local font = LSM:Fetch("font", "PT Sans Narrow")
 local fontHeight = 8
 local fontFlag = "NONE"  -- "MONOCHROMEOUTLINE" etc.
 local fontShadow = true
 local fontColor = {r = 1, g = 1, b = 1, a = 1}
-local distanceFont = "Fonts\\FRIZQT__.TTF"
+local distanceFont = font
 local distanceFontHeight = 8
 local distanceFontFlag = "NONE"  -- "MONOCHROMEOUTLINE" etc.
 local distanceFontShadow = true
