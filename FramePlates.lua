@@ -433,14 +433,12 @@ end -- do
 -------------------
 -- Slash Command --
 -------------------
-do
-  SLASH_FRAMEPLATES1 = "/frameplates"
-  SLASH_FRAMEPLATES2 = "/fp"
-  SlashCmdList.FRAMEPLATES = function()
-    if FramePlatesParent.unlocked then
-      FramePlatesParent:Lock()
-    else
-      FramePlatesParent:Unlock()
-    end -- if
-  end -- function
-end -- do
+SLASH_FRAMEPLATES1 = "/frameplates"
+SLASH_FRAMEPLATES2 = "/fp"
+SlashCmdList.FRAMEPLATES = function()
+  if FramePlatesParent.unlocked then
+    FramePlatesParent:Lock()
+  else
+    FramePlatesParent:Unlock()
+  end -- if
+end -- function
