@@ -8,7 +8,6 @@ local LSM = LibStub("LibSharedMedia-3.0")
 --------------
 -- Settings --
 --------------
--- Visuals
 local frameCount = 15
 local growthDirection = "VERTICAL"  -- VERTICAL, HORIZONTAL
 local frameWidth = 163
