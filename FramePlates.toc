@@ -5,4 +5,7 @@
 
 ## Notes: "Unitframes for your nameplates"
 
+Libs\LibStub\LibStub.lua
+Libs\LibSharedMedia-3.0\lib.xml
+
 FramePlates.lua

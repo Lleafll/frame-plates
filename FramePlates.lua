@@ -1,3 +1,10 @@
+---------------
+-- Libraries --
+---------------
+local LSM = LibStub("LibSharedMedia-3.0")
+
+
+
 --------------
 -- Settings --
 --------------
