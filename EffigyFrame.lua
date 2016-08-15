@@ -152,51 +152,10 @@ EffigyFrameParent:Show()
 ---------------
 -- Functions --
 ---------------
-do
-  local function setDistance(self)
-    local minDistance
-    local maxDistance
-    for i = 0, 100 do
-      local distanceItem = distanceTable[i]
-      if ItemHasRange(distanceItem) then
-        if IsItemInRange(distanceItem, self.unitID) then
-          maxDistance = i
-          if maxDistance <= 3 then
-            minDistance = 0
-          end -- if
-        else
-          minDistance = i
-        end -- if
-      end -- if
-      if maxDistance and minDistance then break end
-    end -- for
-    local distance
-    if not maxDistance or not minDistance then  -- Distance > 100 yd, first range check, or something went wrong
-      distance = ""
-    else
-      distance = maxDistance
-    end -- if
-    self.distanceFontString:SetText(distance)
-  end -- function
-  
+do  
   local function getHealthBar(unitID)
     local nameplateUnitFrame = C_NamePlate_GetNamePlateForUnit(unitID).UnitFrame
     return nameplateUnitFrame.healthBar or nameplateUnitFrame.HealthBar
-  end -- function
-  
-  local function setHealthBarColor(self)
-    local unitID = self.unitID
-    if not UnitExists(unitID) then
-      return
-    end -- if
-    if not self.healthBar then
-      self.healthBar = getHealthBar(unitID)
-    end -- if
-    if UnitIsUnit(unitID, "target") then
-      self.targeted:Show()
-    else
-      self.targeted:Hide()
-    end -- if
   end -- function
   
   local function eventHandler(self, event, unitID)
@@ -210,7 +169,6 @@ do
       self.statusbar:SetMinMaxValues(0, UnitHealthMax(unitID))
       self.statusbar:SetValue(UnitHealth(unitID))
       self.healthBar = getHealthBar(unitID)
-      self:SetHealthBarColor()
       self.NameFontString:SetText(UnitName(unitID))
     end -- if
   end -- function
@@ -241,8 +199,6 @@ do
     frame.statusbar:SetAllPoints()
     frame.statusbar:SetStatusBarTexture(healthBarTexture)
     frame.statusbar:SetMinMaxValues(0, UnitHealthMax(unitID))
-    frame.SetHealthBarColor = setHealthBarColor
-    frame:SetHealthBarColor()
     
     -- Border
     local border = CreateFrame("Frame", nil, frame.statusbar)
@@ -261,20 +217,6 @@ do
     if fontShadow then
       frame.NameFontString:SetShadowOffset(1, -1)
     end -- if
-    
-    -- Distance
-    local distanceFontString = frame:CreateFontString()
-    frame.distanceFontString = distanceFontString
-    distanceFontString:SetPoint("TOPRIGHT", frame, "TOPLEFT")  -- TODO: implement different anchoring of distance font string
-    distanceFontString:SetPoint("BOTTOMRIGHT", frame, "BOTTOMLEFT")
-    distanceFontString:SetWidth(frameHeight)
-    distanceFontString:SetFont(distanceFont, distanceFontHeight, distanceFontFlag)
-    distanceFontString:SetTextColor(distanceFontColor.r, distanceFontColor.g, distanceFontColor.b, distanceFontColor.a)
-    if distanceFontShadow then
-      frame.NameFontString:SetShadowOffset(1, -1)
-    end -- if
-    frame.SetDistance = setDistance
-    frame:SetDistance()
     
     -- Highlighted
     frame.highlight = frame:CreateTexture(nil, "HIGHLIGHT")
@@ -329,28 +271,6 @@ function EffigyFrameParent:CreateFrames()
     end -- for
   end -- if
 end -- function
-
-
-
-------------
--- Ticker --
-------------
-do
-  local tickerFrame = CreateFrame("Frame")
-  local totalElapsed = 0
-  local function tickerFunc(self, elapsed)
-    totalElapsed = totalElapsed + elapsed
-    if totalElapsed > 0.2 then
-      for i = 1, frameCount do
-        local plateFrame = EffigyFrameParent["nameplate"..i]
-        plateFrame:SetHealthBarColor()
-        plateFrame:SetDistance()
-      end -- for
-      totalElapsed = 0
-    end -- if
-  end -- function
-  tickerFrame:SetScript("OnUpdate", tickerFunc)
-end -- do
 
 
 
