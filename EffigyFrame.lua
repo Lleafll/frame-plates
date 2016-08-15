@@ -100,30 +100,6 @@ local oppositePoint = {
   RIGHT = "LEFT",
   UP = "DOWN"
 }
-local distanceTable = {
-  [3] = 42732, -- Everfrost Razor 3 yards
-  [5] = 63427, -- Worgsaw 5 yards, possible alternative: Darkmender's Tincture
-  [8] = 34368, -- Attuned Crystal Cores 8 yards
-  [10] = 32321, -- Sparrowhawk Net 10 yards
-  [15] = 33069, -- Sturdy Rope 15 yards
-  [20] = 10645, -- Gnomish Death Ray 20 yards
-  [25] = 31463, -- Zezzak's Shard 25 yards
-  [30] = 34191, -- Handful of Snowflakes 30 yards
-  [35] = 18904, -- Zorbin's Ultra-Shrinker 35 yards
-  [40] = 28767, -- The Decapitator 40 yards
-  [45] = 23836, -- Goblin Rocket Launcher 45 yards
-  [50] = 116139, -- Haunting Memento 50 yards, possible alternative with 6.2: Drained Blood Crystal
-  -- 55 yards
-  [60] = 37887, -- Seeds of Nature's Wrath 60 yards
-  -- 65 yards
-  [70] = 41265, -- Eyesore Blaster 70 yards
-  -- 75 yards
-  [80] = 35278, -- Reinforced Net 80 yards
-  -- 85 yards
-  -- 90 yards
-  -- 95 yards
-  [100] = 33119 -- Malister's Frost Wand 100 yards
-}
 
 
 
