@@ -5,25 +5,32 @@ local LSM = LibStub("LibSharedMedia-3.0")
 
 
 
+---------------
+-- Constants --
+---------------
+local UI_SCALE = UIParent:GetScale()
+
+
+
 --------------
 -- Settings --
 --------------
 local frameCount = 15
 local growthDirection = "VERTICAL"  -- VERTICAL, HORIZONTAL
-local frameWidth = 163
-local frameHeight = 30
-local framePadding = 1
+local frameWidth = 163 / UI_SCALE
+local frameHeight = 30 / UI_SCALE
+local framePadding = 2
 local backgroundColor = {r = 17/256, g = 17/256, b = 17/256, a = 1}
 local healthBarTexture = LSM:Fetch("statusbar", "Smooth v2")
 local healthBarBorder = true
 local healthBarBorderColor = {r = 0, g = 0, b = 0, a = 1}
 local font = LSM:Fetch("font", "PT Sans Narrow")
-local fontHeight = 8
+local fontHeight = 8 / UI_SCALE
 local fontFlag = "NONE"  -- "MONOCHROMEOUTLINE" etc.
 local fontShadow = true
 local fontColor = {r = 1, g = 1, b = 1, a = 1}
 local distanceFont = font
-local distanceFontHeight = 8
+local distanceFontHeight = 8 / UI_SCALE
 local distanceFontFlag = "NONE"  -- "MONOCHROMEOUTLINE" etc.
 local distanceFontShadow = true
 local distanceFontColor = {r = 1, g = 1, b = 1, a = 1}
@@ -64,13 +71,6 @@ local UnitIsTapDenied = UnitIsTapDenied
 local UnitIsTrivial = UnitIsTrivial
 local UnitIsUnit = UnitIsUnit
 local UnitName = UnitName
-
-
-
----------------
--- Constants --
----------------
-local UI_SCALE = UIParent:GetScale()
 
 
 
@@ -139,7 +139,7 @@ local distanceTable = {
 ------------------
 -- Parent Frame --
 ------------------
-local FramePlatesParent = CreateFrame("Frame", "FramePlates")
+local FramePlatesParent = CreateFrame("Frame", "FramePlates", UIParent)
 FramePlatesParent.background = CreateFrame("Frame", nil, FramePlatesParent)
 FramePlatesParent.background:SetAllPoints()
 FramePlatesParent.background:SetBackdrop(backdrop)
@@ -395,9 +395,9 @@ do
     end) -- function
     self:SetScript("OnMouseWheel", function(self, delta)
       if IsShiftKeyDown() then
-        db.posX = db.posX + delta
+        db.posX = db.posX + delta / UI_SCALE
       else
-        db.posY = db.posY + delta
+        db.posY = db.posY + delta / UI_SCALE
       end -- if
       self:SetPoint("BOTTOMLEFT", UI_SCALE * db.posX, UI_SCALE * db.posY)
     end) -- function
