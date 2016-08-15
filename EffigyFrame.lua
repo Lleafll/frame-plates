@@ -91,6 +91,7 @@ local borderBackdrop = {
 }
 
 
+
 ------------
 -- Lookup --
 ------------
@@ -149,7 +150,7 @@ do
     end -- if
   end -- function
 
-  function EffigyFrameParent:CreateFramePlate(unitID, posX, posY)
+  function EffigyFrameParent:CreateEffigyFrame(unitID, posX, posY)
     -- Secure frame
     local frame = CreateFrame("BUTTON", "$parent".."_"..unitID, self, "SecureUnitButtonTemplate")
     self[unitID] = frame
@@ -236,13 +237,13 @@ function EffigyFrameParent:CreateFrames()
   if growthDirection == "VERTICAL" then
     local posYIncrement = (frameHeight + framePadding) * (reverseY and - 1 or 1) + 2  -- +2 for border
     for i = 1, frameCount do
-      EffigyFrameParent:CreateFramePlate("nameplate"..i, posX, posY)
+      EffigyFrameParent:CreateEffigyFrame("nameplate"..i, posX, posY)
       posY = posY + posYIncrement
     end -- for
   else
     local posXIncrement = (frameWidth + framePadding) * (reverseX and - 1 or 1) + 2  -- +2 for border
     for i = 1, frameCount do
-      EffigyFrameParent:CreateFramePlate("nameplate"..i, posX, posY)
+      EffigyFrameParent:CreateEffigyFrame("nameplate"..i, posX, posY)
       posX = posX + posXIncrement
     end -- for
   end -- if
@@ -311,7 +312,7 @@ do
   local eventHandler = function(self, event, loadedAddon)
     if loadedAddon == "EffigyFrame" then
       EffigyFrameDB = EffigyFrameDB or {}
-      db = FramePlatesDB
+      db = EffigyFrameDB
       db.posX = db.posX or 300
       db.posY = db.posY or 300
       self:SetPoint("BOTTOMLEFT", UI_SCALE * db.posX, UI_SCALE * db.posY)
