@@ -139,7 +139,7 @@ local distanceTable = {
 ------------------
 -- Parent Frame --
 ------------------
-local FramePlatesParent = CreateFrame("Frame")
+local FramePlatesParent = CreateFrame("Frame", "FramePlates")
 FramePlatesParent.background = CreateFrame("Frame", nil, FramePlatesParent)
 FramePlatesParent.background:SetAllPoints()
 FramePlatesParent.background:SetBackdrop(backdrop)
@@ -227,7 +227,7 @@ do
 
   function FramePlatesParent:CreateFramePlate(unitID, posX, posY)
     -- Secure frame
-    local frame = CreateFrame("BUTTON", nil, self, "SecureUnitButtonTemplate")
+    local frame = CreateFrame("BUTTON", "$parent".."_"..unitID, self, "SecureUnitButtonTemplate")
     self[unitID] = frame
     frame.unitID = unitID
     frame:SetAttribute("type", "target")
