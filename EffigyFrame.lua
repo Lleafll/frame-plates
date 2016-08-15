@@ -38,14 +38,6 @@ local highlightTexture = "Interface\\ChatFrame\\ChatFrameBackground"
 local highlightColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.5}
 local targetedTexture = "Interface\\ChatFrame\\ChatFrameBackground"
 local targetedColor = {r = 0.5, g = 0.5, b = 0.5, a = 0.5}
-local colorFunctionString = [[
-  local self, unitID, r, g, b, a = ...
-  if UnitIsTrivial(unitID) then
-    return 0.4, 0.4, 0.4, 1
-  else
-    return r, g, b, a
-  end
-]]
 
 
 
@@ -77,7 +69,6 @@ local UnitName = UnitName
 ---------------
 -- Variables --
 ---------------
-local colorFunction = assert(loadstring(colorFunctionString))
 local db
 local backdrop = {
   bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -139,22 +130,22 @@ local distanceTable = {
 ------------------
 -- Parent Frame --
 ------------------
-local FramePlatesParent = CreateFrame("Frame", "FramePlates", UIParent)
-FramePlatesParent.background = CreateFrame("Frame", nil, FramePlatesParent)
-FramePlatesParent.background:SetAllPoints()
-FramePlatesParent.background:SetBackdrop(backdrop)
-FramePlatesParent.background:SetBackdropColor(0.5, 0.5, 0.5, 0.5)
-FramePlatesParent.background:Hide()
+local EffigyFrameParent = CreateFrame("Frame", "EffigyFrame", UIParent)
+EffigyFrameParent.background = CreateFrame("Frame", nil, EffigyFrameParent)
+EffigyFrameParent.background:SetAllPoints()
+EffigyFrameParent.background:SetBackdrop(backdrop)
+EffigyFrameParent.background:SetBackdropColor(0.5, 0.5, 0.5, 0.5)
+EffigyFrameParent.background:Hide()
 if growthDirection == "VERTICAL" then
-  FramePlatesParent:SetWidth(UI_SCALE * frameWidth)
-  FramePlatesParent:SetHeight(UI_SCALE * (frameHeight * frameCount + framePadding * (frameCount - 1)))
+  EffigyFrameParent:SetWidth(UI_SCALE * frameWidth)
+  EffigyFrameParent:SetHeight(UI_SCALE * (frameHeight * frameCount + framePadding * (frameCount - 1)))
 else
-  FramePlatesParent:SetWidth(UI_SCALE * (frameWidth * frameCount + framePadding * (frameCount - 1)))
-  FramePlatesParent:SetHeight(UI_SCALE * frameHeight)
+  EffigyFrameParent:SetWidth(UI_SCALE * (frameWidth * frameCount + framePadding * (frameCount - 1)))
+  EffigyFrameParent:SetHeight(UI_SCALE * frameHeight)
 end -- if
-FramePlatesParent:SetMovable(true)
-FramePlatesParent:SetUserPlaced(false)
-FramePlatesParent:Show()
+EffigyFrameParent:SetMovable(true)
+EffigyFrameParent:SetUserPlaced(false)
+EffigyFrameParent:Show()
 
 
 
@@ -206,7 +197,6 @@ do
     else
       self.targeted:Hide()
     end -- if
-    self.statusbar:SetStatusBarColor(colorFunction(self, unitID, self.healthBar.r, self.healthBar.g, self.healthBar.b, self.healthBar.a))
   end -- function
   
   local function eventHandler(self, event, unitID)
@@ -225,7 +215,7 @@ do
     end -- if
   end -- function
 
-  function FramePlatesParent:CreateFramePlate(unitID, posX, posY)
+  function EffigyFrameParent:CreateFramePlate(unitID, posX, posY)
     -- Secure frame
     local frame = CreateFrame("BUTTON", "$parent".."_"..unitID, self, "SecureUnitButtonTemplate")
     self[unitID] = frame
@@ -321,20 +311,20 @@ end -- do
 --------------------
 -- Frame Creation --
 --------------------
-function FramePlatesParent:CreateFrames()
+function EffigyFrameParent:CreateFrames()
   local i = 1
   local posX = 0
   local posY = 0
   if growthDirection == "VERTICAL" then
     local posYIncrement = (frameHeight + framePadding) * (reverseY and - 1 or 1) + 2  -- +2 for border
     for i = 1, frameCount do
-      FramePlatesParent:CreateFramePlate("nameplate"..i, posX, posY)
+      EffigyFrameParent:CreateFramePlate("nameplate"..i, posX, posY)
       posY = posY + posYIncrement
     end -- for
   else
     local posXIncrement = (frameWidth + framePadding) * (reverseX and - 1 or 1) + 2  -- +2 for border
     for i = 1, frameCount do
-      FramePlatesParent:CreateFramePlate("nameplate"..i, posX, posY)
+      EffigyFrameParent:CreateFramePlate("nameplate"..i, posX, posY)
       posX = posX + posXIncrement
     end -- for
   end -- if
@@ -352,7 +342,7 @@ do
     totalElapsed = totalElapsed + elapsed
     if totalElapsed > 0.2 then
       for i = 1, frameCount do
-        local plateFrame = FramePlatesParent["nameplate"..i]
+        local plateFrame = EffigyFrameParent["nameplate"..i]
         plateFrame:SetHealthBarColor()
         plateFrame:SetDistance()
       end -- for
@@ -379,7 +369,7 @@ do
     self:SetPoint("BOTTOMLEFT", UI_SCALE * db.posX, UI_SCALE * db.posY)
   end -- function
 
-  function FramePlatesParent:Unlock()
+  function EffigyFrameParent:Unlock()
     self.background:Show()
     self:EnableMouse(true)
     self:SetScript("OnMouseDown", function(self, button)
@@ -402,17 +392,17 @@ do
       self:SetPoint("BOTTOMLEFT", UI_SCALE * db.posX, UI_SCALE * db.posY)
     end) -- function
     self.unlocked = true
-    print("Frame Plates unlocked")
+    print("EffigyFrame unlocked")
   end -- function
 
-  function FramePlatesParent:Lock()
+  function EffigyFrameParent:Lock()
     self.background:Hide()
     self:EnableMouse(false)
     self:SetScript("OnMouseDown", nil)
     self:SetScript("OnMouseUp", nil)
     self:SetScript("OnMouseWheel", nil)
     self.unlocked = false
-    print("Frame Plates locked")
+    print("EffigyFrame locked")
   end -- function
 end -- do
 
@@ -423,8 +413,8 @@ end -- do
 --------------------
 do
   local eventHandler = function(self, event, loadedAddon)
-    if loadedAddon == "FramePlates" then
-      FramePlatesDB = FramePlatesDB or {}
+    if loadedAddon == "EffigyFrame" then
+      EffigyFrameDB = EffigyFrameDB or {}
       db = FramePlatesDB
       db.posX = db.posX or 300
       db.posY = db.posY or 300
@@ -433,8 +423,8 @@ do
       self:CreateFrames()
     end -- if
   end -- function
-  FramePlatesParent:RegisterEvent("ADDON_LOADED")
-  FramePlatesParent:SetScript("OnEvent", eventHandler)
+  EffigyFrameParent:RegisterEvent("ADDON_LOADED")
+  EffigyFrameParent:SetScript("OnEvent", eventHandler)
 end -- do
 
 
@@ -442,12 +432,12 @@ end -- do
 -------------------
 -- Slash Command --
 -------------------
-SLASH_FRAMEPLATES1 = "/frameplates"
-SLASH_FRAMEPLATES2 = "/fp"
-SlashCmdList.FRAMEPLATES = function()
-  if FramePlatesParent.unlocked then
-    FramePlatesParent:Lock()
+SLASH_EFFIGYFRAME1 = "/effigyframe"
+SLASH_EFFIGYFRAME2 = "/ef"
+SlashCmdList.EFFIGYFRAME = function()
+  if EffigyFrameParent.unlocked then
+    EffigyFrameParent:Lock()
   else
-    FramePlatesParent:Unlock()
+    EffigyFrameParent:Unlock()
   end -- if
 end -- function

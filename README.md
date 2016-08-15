@@ -1,7 +1,7 @@
-# Frame Plates
+# Effigy Frame
 
-World of Warcraft:Legion addon which tracks nameplates in a separate unitframe-like grid.
+World of Warcraft:Legion addon which tracks Soul Effigy in a clickable frame.
 
-Slash commands: /fp, /frameplates
+Slash commands: /ef, /effigyframe
 
-Change settings in FramePlates.lua
+Change settings in EffigyFrame.lua

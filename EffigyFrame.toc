@@ -1,0 +1,11 @@
+## Interface: 70000
+## Title: Effigy Frame
+## Author: Lleaf
+## SavedVariables: EffigyFrameDB
+
+## Notes: "Unitframe for Soul Effigy"
+
+Libs\LibStub\LibStub.lua
+Libs\LibSharedMedia-3.0\lib.xml
+
+EffigyFrame.lua
