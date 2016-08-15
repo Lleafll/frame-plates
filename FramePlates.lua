@@ -66,10 +66,12 @@ local UnitIsUnit = UnitIsUnit
 local UnitName = UnitName
 
 
+
 ---------------
 -- Constants --
 ---------------
 local UI_SCALE = UIParent:GetScale()
+
 
 
 ---------------
@@ -133,6 +135,7 @@ local distanceTable = {
 }
 
 
+
 ------------------
 -- Parent Frame --
 ------------------
@@ -152,6 +155,7 @@ end -- if
 FramePlatesParent:SetMovable(true)
 FramePlatesParent:SetUserPlaced(false)
 FramePlatesParent:Show()
+
 
 
 ---------------
@@ -313,6 +317,7 @@ do
 end -- do
 
 
+
 --------------------
 -- Frame Creation --
 --------------------
@@ -336,6 +341,7 @@ function FramePlatesParent:CreateFrames()
 end -- function
 
 
+
 ------------
 -- Ticker --
 ------------
@@ -355,6 +361,7 @@ do
   end -- function
   tickerFrame:SetScript("OnUpdate", tickerFunc)
 end -- do
+
 
 
 --------------
@@ -410,6 +417,7 @@ do
 end -- do
 
 
+
 --------------------
 -- Initialization --
 --------------------
@@ -428,6 +436,7 @@ do
   FramePlatesParent:RegisterEvent("ADDON_LOADED")
   FramePlatesParent:SetScript("OnEvent", eventHandler)
 end -- do
+
 
 
 -------------------
